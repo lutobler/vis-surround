@@ -1,4 +1,3 @@
--- all possible surroundings
 local surroundings = {
     { '{', '}' },
     { '[', ']' },
@@ -17,9 +16,7 @@ local function left(a)
                 return i[1]
             end
         else
-            if i == a then
-                return a
-            end
+            if i == a then return a end
         end
     end
 end
@@ -33,48 +30,9 @@ local function right(a)
                 return a
             end
         else
-            if i == a then
-                return a
-            end
+            if i == a then return a end
         end
     end
-end
-
-local function flatten(t)
-    local r = {}
-    local function f(t)
-        for _,v in ipairs(t) do
-            if type(v) == 'table' then
-                f(v)
-            else
-                table.insert(r, v)
-            end
-        end
-    end
-    f(t)
-    return r
-end
-
-local function mappings(s)
-    local m = {}
-    local flat = flatten(s)
-    for _,i in pairs(s) do
-        if type(i) == 'table' then
-            for _,j in pairs(flat) do
-                if j ~= i[1] and j ~= i[2] then
-                    table.insert(m, i[1]..j)
-                    table.insert(m, i[2]..j)
-                end
-            end
-        else
-            for _,j in pairs(flat) do
-                if j ~= i then
-                    table.insert(m, i..j)
-                end
-            end
-        end
-    end
-    return m
 end
 
 -- escape all magic characters with a '%'
@@ -106,49 +64,50 @@ local function find_surrounding(file, pos, left, right)
     end
 end
 
-local function change_surrounding(i)
-    local old, new = i:sub(1,1), i:sub(2,2)
+local function change_surrounding(keys)
+    if #keys < 2 then
+        return -1
+    end
+    local old, new = keys:sub(1,1), keys:sub(2,2)
     local left_old, right_old = left(old), right(old)
     local left_new, right_new = left(new), right(new)
-
-    return function()
-        local win = vis.win
-        local file = win.file
-        local pos = win.selection.pos
-
-        local l, r = find_surrounding(file, pos, left_old, right_old)
-        if not l or not r then return end
-
-        win.file:delete(l, 1)
-        win.file:insert(l, left_new)
-        win.file:delete(r, 1)
-        win.file:insert(r, right_new)
-        win.selection.pos = pos
+    if not (left_old and right_old and left_new and left_right) then
+        return 2
     end
+    local win = vis.win
+    local file = win.file
+    local pos = win.selection.pos
+    local l, r = find_surrounding(file, pos, left_old, right_old)
+    if not l or not r then return end
+
+    win.file:delete(l, 1)
+    win.file:insert(l, left_new)
+    win.file:delete(r, 1)
+    win.file:insert(r, right_new)
+    win.selection.pos = pos
+    return 2
 end
 
-local function delete_surrounding(i)
-    local left = left(i)
-    local right = right(i)
-
-    return function()
-        local win = vis.win
-        local file = win.file
-        local pos = win.selection.pos
-
-        local l, r = find_surrounding(file, pos, left, right)
-        if not l or not r then return end
-
-        win.file:delete(l, 1)
-        win.file:delete(r-1, 1)
-        win.selection.pos = pos-1
+local function delete_surrounding(keys)
+    if #keys < 1 then
+        return -1
     end
+    local left = left(keys)
+    local right = right(keys)
+    if not (left and right) then return 1 end
+    local win = vis.win
+    local file = win.file
+    local pos = win.selection.pos
+
+    local l, r = find_surrounding(file, pos, left, right)
+    if not l or not r then return end
+
+    win.file:delete(l, 1)
+    win.file:delete(r-1, 1)
+    win.selection.pos = pos-1
+    return 1
 end
 
-for _,i in pairs(mappings(surroundings)) do
-    vis:map(vis.modes.NORMAL, "cs"..i, change_surrounding(i))
-end
+vis:map(vis.modes.NORMAL, "cs", change_surrounding, "Change surroundings")
+vis:map(vis.modes.NORMAL, "ds", delete_surrounding, "Delete surroundings")
 
-for _,i in pairs(flatten(surroundings)) do
-    vis:map(vis.modes.NORMAL, "ds"..i, delete_surrounding(i))
-end
