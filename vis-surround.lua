@@ -106,7 +106,6 @@ local function change_surrounding(keys)
         if not (tag_old and tag_new) then
             return -1
         end
-        vis:info(tag_old..", "..tag_new)
         local win = vis.win
         local file = win.file
         local pos = win.selection.pos
