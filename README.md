@@ -10,7 +10,7 @@ require("vis-surround")
 
 ### Usage
 
-Use the `cs` prefix and two surrounding characters to change surroundings, use `ds` and a surrounding character to delete a surrounding.
+Use the `cs` ("change surrounding") prefix and two surrounding characters to change surroundings, use `ds` ("delete surrounding") and a surrounding character to delete a surrounding.
 
 Examples:
 
@@ -36,5 +36,5 @@ Hello world!
 ```
 
 ### TODO
-- [ ] XML tags
+- [x] XML tags
 - [ ] Adding tags with text objects
