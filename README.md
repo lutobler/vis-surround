@@ -37,4 +37,5 @@ Hello world!
 
 ### TODO
 - [x] XML tags
+- [ ] XML/HTML tags with attributes (i.e. <p class="foo">)
 - [ ] Adding tags with text objects
