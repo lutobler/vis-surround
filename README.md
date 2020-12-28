@@ -3,9 +3,10 @@
 `vis-surround` aims to port Tim Pope's [vim-surround](https://github.com/tpope/vim-surround) to Vis. It is not quite as powerful yet, see the TODO list below.
 
 ### Installation
-Add the Lua file to you Vis path (`~/.config/vis`) and add this to your `visrc.lua`:
+Clone the repo to your vis plugins directory (`~/.config/vis/plugins`) and add
+this to your `visrc.lua`:
 ```
-require("vis-surround")
+require("plugins/vis-surround")
 ```
 
 ### Usage
